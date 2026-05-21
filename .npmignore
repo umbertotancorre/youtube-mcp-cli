@@ -1,5 +1,0 @@
-src/
-tsconfig.json
-ts-node
-node_modules/
-.gitignore

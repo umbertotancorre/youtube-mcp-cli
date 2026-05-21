@@ -2,6 +2,9 @@ node_modules/
 dist/
 .claude/
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # Env files
 .env
 .env.*
@@ -10,9 +13,6 @@ dist/
 # OS files
 .DS_Store
 Thumbs.db
-
-# YouTube player scripts (downloaded by ytdl-core)
-*-player-script.js
 
 # Logs
 *.log
