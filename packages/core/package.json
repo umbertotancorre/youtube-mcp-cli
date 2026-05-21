@@ -1,0 +1,23 @@
+{
+  "name": "@umbertotancorre/youtube-core",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Shared core logic for youtube-mcp and youtube-cli",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "youtube-transcript": "^1.2.1",
+    "ytdlp-nodejs": "^3.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

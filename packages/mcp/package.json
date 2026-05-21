@@ -1,0 +1,41 @@
+{
+  "name": "@umbertotancorre/youtube-mcp",
+  "version": "1.1.0",
+  "description": "MCP server for YouTube transcripts, metadata, search, and downloads",
+  "main": "dist/index.js",
+  "bin": {
+    "youtube-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbertotancorre/youtube-mcp-cli.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": ["mcp", "modelcontextprotocol", "youtube", "transcript", "download", "ai"],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "postinstall": "node -e \"const{helpers}=require('ytdlp-nodejs');const d=helpers.BIN_DIR;Promise.all([helpers.downloadYtDlp(d),helpers.downloadFFmpeg(d)]).catch(e=>{console.error(e.message);process.exit(1)})\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "youtube-transcript": "^1.2.1",
+    "ytdlp-nodejs": "^3.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
