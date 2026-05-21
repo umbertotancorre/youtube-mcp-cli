@@ -1,112 +1,175 @@
-# YouTube MCP Server
+# youtube-mcp-cli
 
-[![npm](https://img.shields.io/npm/v/@umbertotancorre/youtube-mcp)](https://www.npmjs.com/package/@umbertotancorre/youtube-mcp)
+[![npm mcp](https://img.shields.io/npm/v/@umbertotancorre/youtube-mcp?label=%40umbertotancorre%2Fyoutube-mcp)](https://www.npmjs.com/package/@umbertotancorre/youtube-mcp)
+[![npm cli](https://img.shields.io/npm/v/@umbertotancorre/youtube-cli?label=%40umbertotancorre%2Fyoutube-cli)](https://www.npmjs.com/package/@umbertotancorre/youtube-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
-[![GitHub stars](https://img.shields.io/github/stars/umbertotancorre/youtube-mcp)](https://github.com/umbertotancorre/youtube-mcp)
 
 **Zero Setup · No API Key · No Account · Open Source**
 
-An [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible AI agents the ability to access YouTube knowledge:
+One repo, two packages. Access YouTube from your AI agent or your terminal:
 
-- Fetch transcript (with or without timestamps)
-- Download transcript as `.md` (with or without timestamps)
+| Want to… | Use |
+|---|---|
+| Give YouTube tools to an AI (Claude, Cursor, etc.) | [`@umbertotancorre/youtube-mcp`](#mcp-server) |
+| Use YouTube tools from the terminal | [`@umbertotancorre/youtube-cli`](#cli) |
+
+Capabilities shared by both:
+
+- Fetch transcript (plain text or with timestamps)
+- Download transcript as `.md`
 - Get video metadata
 - Search within captions
-- Download videos
-- Download audio
+- Download video or audio
 
 All locally, no third-party API keys.
 
+---
+
 ## Table of Contents
 
-- [How It Works](#how-it-works)
-- [Tools](#tools)
-- [Installation](#installation)
-  - [Method A: AI Setup](#method-a-ai-setup)
-  - [Method B: Manual Setup](#method-b-manual-setup)
-- [Development](#development)
+- [MCP Server](#mcp-server)
+  - [Tools](#tools)
+  - [Installation](#installation)
+- [CLI](#cli)
   - [Commands](#commands)
-  - [Layout](#layout)
+  - [Installation](#installation-1)
+- [Development](#development)
 - [Disclaimer](#disclaimer)
 - [License](#license)
 
-## How It Works
+---
 
-The Model Context Protocol (MCP) lets you expose local tools to an AI agent. This project implements an MCP server with **8 tools**.
+## MCP Server
 
-## Tools
+### Tools
 
 | Tool | Description |
-|------|-------------|
-| `get_transcript` | Fetches the full transcript of a video as plain text |
-| `get_transcript_timed` | Same as above, but each segment is prefixed with a `[MM:SS]` timestamp |
-| `download_transcript` | Downloads the transcript as a `.md` file |
-| `download_transcript_timed` | Downloads the transcript as a `.md` file with timestamps |
-| `get_metadata` | Returns title, channel, publish date, view count, duration, category, likes, channel URL, channel ID, and description |
-| `search_transcript` | Searches for a keyword or phrase in the transcript and returns matching segments with timestamps |
-| `download_video` | Downloads a video (video+audio) as `.mp4` to your machine |
-| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, etc.) to your machine |
+|---|---|
+| `get_transcript` | Fetches the full transcript as plain text |
+| `get_transcript_timed` | Transcript with `[MM:SS]` timestamps per segment |
+| `download_transcript` | Saves transcript as a `.md` file |
+| `download_transcript_timed` | Saves transcript as a `.md` file with timestamps |
+| `get_metadata` | Returns title, channel, publish date, view count, duration, likes, and description |
+| `search_transcript` | Searches for a keyword or phrase and returns matching segments with timestamps |
+| `download_video` | Downloads video+audio as `.mp4` |
+| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, etc.) |
 
-`download_video` and `download_audio` are fully self-contained. Both [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://github.com/FFmpeg/FFmpeg) are downloaded automatically during `npm install` - no manual setup needed.
+`download_video` and `download_audio` are fully self-contained. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://github.com/FFmpeg/FFmpeg) are downloaded automatically on `npm install`.
 
-## Installation
+### Installation
 
-Two ways to get started:
+**Method A: let your AI do it**
 
-### Method A: AI setup
-
-If your AI supports installing MCP servers directly, simply tell it:
+Tell your AI agent:
 
 ```
 Add youtube-mcp as an MCP server. Run it with: npx @umbertotancorre/youtube-mcp
 ```
 
-### Method B: Manual setup
+**Method B: manual config**
 
-```bash
-npx @umbertotancorre/youtube-mcp
+Add this to your MCP client config (e.g. `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "youtube": {
+      "command": "npx",
+      "args": ["-y", "@umbertotancorre/youtube-mcp"]
+    }
+  }
+}
 ```
 
-Then point your MCP client to:
+All tools appear automatically. No install needed, `npx` handles it on first run.
 
-```
-npx @umbertotancorre/youtube-mcp
-```
+---
 
-That is the only line you need in any MCP config. All tools will appear automatically.
-
-## Development
+## CLI
 
 ### Commands
 
+```
+youtube-cli transcript <url>                  Print transcript as plain text
+youtube-cli transcript <url> --timestamps     Include [MM:SS] timestamps
+youtube-cli transcript <url> --save           Save as .md to Downloads
+youtube-cli transcript <url> --language it    Fetch in a specific language
+
+youtube-cli search <url> <query>              Search transcript with timestamps
+youtube-cli metadata <url>                    Print title, channel, views, duration
+youtube-cli metadata <url> --json             Output as JSON
+
+youtube-cli download <url>                    Download video to Downloads
+youtube-cli download <url> --quality hd1080   Choose quality
+youtube-cli download <url> --audio            Download audio only (mp3)
+youtube-cli download <url> --audio --format flac
+
+youtube-cli completions                       Print bash completion script
+youtube-cli completions zsh                   Print zsh completion script
+```
+
+Downloads always go to the platform-native Downloads folder:
+
+| OS | Path |
+|---|---|
+| macOS | `~/Downloads` |
+| Linux | `$XDG_DOWNLOAD_DIR` or `~/Downloads` |
+| Windows | `%USERPROFILE%\Downloads` |
+
+### Installation
+
+**Global install (recommended):**
+
 ```bash
-npm run dev    # run directly with ts-node (no build step)
-npm run build  # compile TypeScript to dist/
-npm start      # run the compiled output
+npm install -g @umbertotancorre/youtube-cli
+youtube-cli --help
 ```
 
-### Layout
+**One-off use without installing:**
+
+```bash
+npx @umbertotancorre/youtube-cli transcript dQw4w9WgXcQ
+```
+
+**Shell completions (optional):**
+
+```bash
+# bash
+source <(youtube-cli completions)
+
+# zsh
+youtube-cli completions zsh > ~/.zsh/completions/_youtube-cli
+```
+
+---
+
+## Development
+
+This is an npm workspaces monorepo with three packages:
 
 ```
-youtube-mcp/
-  src/
-    index.ts          # MCP server with all 8 tools
-  dist/               # Compiled JavaScript output
-  node_modules/       # Dependencies (ignored by git)
-  package.json
-  tsconfig.json
-  README.md
-  LICENSE
-  .npmignore
+youtube-mcp-cli/
+  packages/
+    core/     # shared logic (transcripts, metadata, downloads)
+    mcp/      # MCP server (@umbertotancorre/youtube-mcp)
+    cli/      # CLI tool     (@umbertotancorre/youtube-cli)
 ```
+
+```bash
+npm run build        # build all packages (core, mcp, cli in order)
+npm run dev:mcp      # build core, then run MCP server via ts-node
+npm run dev:cli      # build core, then run CLI via ts-node
+```
+
+---
 
 ## Disclaimer
 
-This server only accesses **publicly available** YouTube data, the same captions, metadata, and streams you see when visiting youtube.com in a browser. It does not bypass any authentication, paywalls, or age gates. No API key, account, or login is required.
+This project only accesses **publicly available** YouTube data: the same captions, metadata, and streams visible in any browser. It does not bypass authentication, paywalls, or age gates. No API key, account, or login is required.
 
-End users are responsible for complying with YouTube's Terms of Service. The maintainer of this project does not host, operate, or provide any service, this is a local tool you run on your own machine.
+End users are responsible for complying with YouTube's Terms of Service. The maintainer does not host or operate any service. This is a local tool you run on your own machine.
 
 ## License
 
-`@umbertotancorre/youtube-mcp` is fully open source, licensed under the [MIT License](LICENSE).
+`youtube-mcp-cli` is fully open source, licensed under the [MIT License](LICENSE).
