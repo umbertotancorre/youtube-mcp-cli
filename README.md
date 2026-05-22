@@ -1,4 +1,4 @@
-# youtube-mcp-cli
+# YouTube MCP server and CLI
 
 [![npm mcp](https://img.shields.io/npm/v/@umbertotancorre/youtube-mcp?label=%40umbertotancorre%2Fyoutube-mcp)](https://www.npmjs.com/package/@umbertotancorre/youtube-mcp)
 [![npm cli](https://img.shields.io/npm/v/@umbertotancorre/youtube-cli?label=%40umbertotancorre%2Fyoutube-cli)](https://www.npmjs.com/package/@umbertotancorre/youtube-cli)
@@ -7,14 +7,7 @@
 
 **Zero Setup · No API Key · No Account · Open Source**
 
-One repo, two packages. Access YouTube from your AI agent or your terminal:
-
-| Want to… | Use |
-|---|---|
-| Give YouTube tools to an AI (Claude, Cursor, etc.) | [`@umbertotancorre/youtube-mcp`](#mcp-server) |
-| Use YouTube tools from the terminal | [`@umbertotancorre/youtube-cli`](#cli) |
-
-Capabilities shared by both:
+YouTube is full of knowledge, but it is trapped there. AI agents cannot access it natively. This repo ships two packages that fix that: an MCP server for AI agents and a CLI for the terminal.
 
 - Fetch transcript (plain text or with timestamps)
 - Download transcript as `.md`
@@ -22,7 +15,12 @@ Capabilities shared by both:
 - Search within captions
 - Download video or audio
 
-All locally, no third-party API keys.
+Available as:
+
+- MCP: [`@umbertotancorre/youtube-mcp`](#mcp-server)
+- CLI: [`@umbertotancorre/youtube-cli`](#cli)
+
+All locally. No API keys required.
 
 ---
 
@@ -53,7 +51,7 @@ All locally, no third-party API keys.
 | `get_metadata` | Returns title, channel, publish date, view count, duration, likes, and description |
 | `search_transcript` | Searches for a keyword or phrase and returns matching segments with timestamps |
 | `download_video` | Downloads video+audio as `.mp4` |
-| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, etc.) |
+| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, ...) |
 
 `download_video` and `download_audio` are fully self-contained. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://github.com/FFmpeg/FFmpeg) are downloaded automatically on `npm install`.
 

@@ -1,12 +1,11 @@
-# @umbertotancorre/youtube-mcp
+# YouTube MCP
 
 [![npm](https://img.shields.io/npm/v/@umbertotancorre/youtube-mcp)](https://www.npmjs.com/package/@umbertotancorre/youtube-mcp)
+[![npm downloads](https://img.shields.io/npm/dt/@umbertotancorre/youtube-mcp?color=blue)](https://www.npmjs.com/package/@umbertotancorre/youtube-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 
-**Zero Setup · No API Key · No Account · Open Source**
-
-An [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible AI agent the ability to access YouTube:
+An [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible AI agents the ability to access YouTube:
 
 - Fetch transcript (plain text or with timestamps)
 - Download transcript as `.md`
@@ -14,7 +13,7 @@ An [MCP](https://modelcontextprotocol.io) server that gives any MCP-compatible A
 - Search within captions
 - Download video or audio
 
-All locally, no third-party API keys.
+All locally. No API keys required.
 
 ## Installation
 
@@ -54,7 +53,7 @@ All tools appear automatically. No install needed, `npx` handles it on first run
 | `get_metadata` | Returns title, channel, publish date, view count, duration, likes, and description |
 | `search_transcript` | Searches for a keyword or phrase and returns matching segments with timestamps |
 | `download_video` | Downloads video+audio as `.mp4` |
-| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, etc.) |
+| `download_audio` | Downloads audio as `.mp3` (or `m4a`, `flac`, `opus`, ...) |
 
 `download_video` and `download_audio` are fully self-contained. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://github.com/FFmpeg/FFmpeg) are downloaded automatically on install.
 

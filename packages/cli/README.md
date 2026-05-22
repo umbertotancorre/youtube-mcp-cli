@@ -1,10 +1,9 @@
-# @umbertotancorre/youtube-cli
+# YouTube CLI
 
 [![npm](https://img.shields.io/npm/v/@umbertotancorre/youtube-cli)](https://www.npmjs.com/package/@umbertotancorre/youtube-cli)
+[![npm downloads](https://img.shields.io/npm/dt/@umbertotancorre/youtube-cli?color=blue)](https://www.npmjs.com/package/@umbertotancorre/youtube-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
-
-**Zero Setup · No API Key · No Account · Open Source**
 
 A command-line tool to access YouTube from your terminal:
 
@@ -14,7 +13,7 @@ A command-line tool to access YouTube from your terminal:
 - Search within captions
 - Download video or audio
 
-All locally, no third-party API keys.
+All locally. No API keys required.
 
 ## Installation
 
@@ -22,7 +21,6 @@ All locally, no third-party API keys.
 
 ```bash
 npm install -g @umbertotancorre/youtube-cli
-youtube-cli --help
 ```
 
 **One-off use without installing:**
@@ -34,6 +32,9 @@ npx @umbertotancorre/youtube-cli transcript dQw4w9WgXcQ
 ## Commands
 
 ```
+youtube-cli --help                            Show all commands and options
+youtube-cli --version                         Print the installed version
+
 youtube-cli transcript <url>                  Print transcript as plain text
 youtube-cli transcript <url> --timestamps     Include [MM:SS] timestamps
 youtube-cli transcript <url> --save           Save as .md to Downloads
