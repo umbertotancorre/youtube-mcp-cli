@@ -1,4 +1,3 @@
-import { YoutubeTranscript } from "youtube-transcript";
 import path from "path";
 import os from "os";
 import { execFile, spawn } from "child_process";
@@ -229,28 +228,110 @@ export async function fetchVideoMetadata(videoId: string): Promise<Record<string
 
 export function transcriptErrorText(videoId: string, err: unknown): string {
   const message = err instanceof Error ? err.message : String(err);
-  if (message.includes("Could not get transcripts")) {
-    return `No transcript available for video ${videoId}. The video may be private, age-restricted, or have captions disabled.`;
-  }
-  if (message.includes("Transcript fetch timed out")) {
+  if (message.includes("timed out")) {
     return `Transcript fetch timed out for video ${videoId}. Please try again.`;
   }
-  if (message.includes("net::") || message.includes("ENOTFOUND") || message.includes("ECONNREFUSED")) {
+  if (message.includes("No transcript available") || message.includes("captions")) {
+    return `No transcript available for video ${videoId}. The video may not have captions.`;
+  }
+  if (message.includes("ENOTFOUND") || message.includes("ECONNREFUSED")) {
     return `Network error while fetching transcript for video ${videoId}. Please check your internet connection.`;
   }
   return `Failed to fetch transcript for video ${videoId}: ${message}`;
 }
 
-async function fetchSegments(videoId: string, language: string): Promise<TranscriptSegment[]> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Transcript fetch timed out")), 15_000)
-  );
-  const segments = await Promise.race([
-    YoutubeTranscript.fetchTranscript(videoId, { lang: language }),
-    timeout,
-  ]) as TranscriptSegment[];
-  if (!segments || segments.length === 0) throw new Error(`No transcript found for video ${videoId}.`);
+function parseVttTime(ts: string): number {
+  const parts = ts.split(":");
+  const h = parseInt(parts[0]);
+  const m = parseInt(parts[1]);
+  const s = parseFloat(parts[2]);
+  return (h * 3600 + m * 60 + s) * 1000;
+}
+
+function parseVtt(content: string): TranscriptSegment[] {
+  const segments: TranscriptSegment[] = [];
+  const seen = new Set<string>();
+  const blocks = content.split(/\r?\n\r?\n/);
+
+  for (const block of blocks) {
+    const lines = block.split(/\r?\n/);
+    const timingIdx = lines.findIndex((l) => l.includes(" --> "));
+    if (timingIdx === -1) continue;
+
+    const timingMatch = lines[timingIdx].match(
+      /(\d{2}:\d{2}:\d{2}\.\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2}\.\d{3})/
+    );
+    if (!timingMatch) continue;
+
+    const offset = parseVttTime(timingMatch[1]);
+    const end = parseVttTime(timingMatch[2]);
+    const text = lines
+      .slice(timingIdx + 1)
+      .join(" ")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!text) continue;
+    const key = `${offset}|${text}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    segments.push({ text, offset, duration: end - offset });
+  }
+
   return segments;
+}
+
+async function fetchSegments(videoId: string, language: string): Promise<TranscriptSegment[]> {
+  const binaryPath = findBinaryPath();
+  if (!binaryPath) throw new Error("yt-dlp binary not found. Try reinstalling: npm install");
+
+  const tmpDir = path.join(os.tmpdir(), `ytmcp-${videoId}-${Date.now()}`);
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  try {
+    const outputTemplate = path.join(tmpDir, "sub");
+    const args = buildYtdlArgs([
+      `https://www.youtube.com/watch?v=${videoId}`,
+      "--skip-download",
+      "--write-auto-sub",
+      "--write-sub",
+      "--sub-langs", `${language}.*`,
+      "--sub-format", "vtt",
+      "-o", outputTemplate,
+      "--no-warnings",
+      "--quiet",
+    ]);
+
+    await new Promise<void>((resolve, reject) => {
+      const child = execFile(binaryPath, args, (err, _stdout, stderr) => {
+        clearTimeout(timer);
+        if (err) reject(new Error(`yt-dlp failed: ${stderr || err.message}`));
+        else resolve();
+      });
+      const timer = setTimeout(() => {
+        child.kill();
+        reject(new Error("Transcript fetch timed out"));
+      }, 30_000);
+    });
+
+    const vttFiles = fs.readdirSync(tmpDir).filter((f) => f.endsWith(".vtt"));
+    if (vttFiles.length === 0) {
+      throw new Error(`No transcript available for video ${videoId}. The video may not have captions in language "${language}".`);
+    }
+
+    const content = fs.readFileSync(path.join(tmpDir, vttFiles[0]), "utf-8");
+    const segments = parseVtt(content);
+    if (segments.length === 0) throw new Error(`No transcript found for video ${videoId}.`);
+    return segments;
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 }
 
 export async function getTranscriptText(videoId: string, language = "en"): Promise<string> {

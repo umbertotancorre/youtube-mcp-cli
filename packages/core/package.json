@@ -13,7 +13,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "youtube-transcript": "^1.2.1",
     "ytdlp-nodejs": "^3.4.4"
   },
   "devDependencies": {
