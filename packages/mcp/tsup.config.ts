@@ -6,5 +6,5 @@ export default defineConfig({
   target: "node18",
   outDir: "dist",
   clean: true,
-  external: ["@modelcontextprotocol/sdk", "youtube-transcript", "ytdlp-nodejs"],
+  external: ["@modelcontextprotocol/sdk", "ytdlp-nodejs"],
 });

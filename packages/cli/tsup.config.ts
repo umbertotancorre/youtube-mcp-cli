@@ -7,5 +7,5 @@ export default defineConfig({
   outDir: "dist",
   clean: true,
   banner: { js: "#!/usr/bin/env node" },
-  external: ["commander", "youtube-transcript", "ytdlp-nodejs"],
+  external: ["commander", "ytdlp-nodejs"],
 });
