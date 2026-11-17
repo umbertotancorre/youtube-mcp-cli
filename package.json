@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w packages/core && npm run build -w packages/mcp && npm run build -w packages/cli",
+    "build": "cp packages/mcp/scripts/postinstall.cjs packages/cli/scripts/postinstall.cjs && npm run build -w packages/core && npm run build -w packages/mcp && npm run build -w packages/cli",
     "dev:mcp": "npm run build -w packages/core && npm run dev -w packages/mcp",
     "dev:cli": "npm run build -w packages/core && npm run dev -w packages/cli"
   },

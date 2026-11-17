@@ -1,6 +1,6 @@
 {
   "name": "@umbertotancorre/youtube-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "CLI for YouTube transcripts, metadata, search, and downloads",
   "main": "dist/index.js",
   "bin": {
@@ -8,6 +8,7 @@
   },
   "files": [
     "dist",
+    "scripts",
     "README.md",
     "LICENSE"
   ],
@@ -25,7 +26,7 @@
     "build": "tsup",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "postinstall": "node -e \"const{helpers}=require('ytdlp-nodejs');const d=helpers.BIN_DIR;Promise.all([helpers.downloadYtDlp(d),helpers.downloadFFmpeg(d)]).catch(e=>{console.error(e.message);process.exit(1)})\""
+    "postinstall": "node scripts/postinstall.cjs"
   },
   "dependencies": {
     "commander": "^14.0.3",

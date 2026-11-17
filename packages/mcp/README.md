@@ -57,6 +57,14 @@ All tools appear automatically. No install needed, `npx` handles it on first run
 
 `download_video` and `download_audio` are fully self-contained. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://github.com/FFmpeg/FFmpeg) are downloaded automatically on install.
 
+## Good to know
+
+**First run takes a few minutes.** On first install, `yt-dlp` and `ffmpeg` are downloaded and your OS runs a one-time security scan on them (about 3 minutes on a fresh Mac). After that, every start takes under a second. If your MCP client times out on that first launch, just restart it.
+
+**Transcripts are saved for 7 days** in `~/.cache/youtube-mcp/transcripts/`, so asking about the same video again is instant and doesn't contact YouTube. To turn saving off, add `"env": { "YOUTUBE_MCP_NO_CACHE": "1" }` to the server's entry in your MCP config.
+
+**If YouTube blocks you.** YouTube temporarily limits how many transcripts one internet connection can fetch. When that happens you'll get a clear "YouTube is temporarily limiting requests" message instead of a vague error. Waiting (sometimes a few hours) clears it, and saved transcripts keep working in the meantime.
+
 ## Also available
 
 Looking for a terminal tool instead? See [`@umbertotancorre/youtube-cli`](https://www.npmjs.com/package/@umbertotancorre/youtube-cli).
