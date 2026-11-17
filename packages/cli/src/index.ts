@@ -69,11 +69,16 @@ Examples:
   $ youtube-cli transcript dQw4w9WgXcQ
   $ youtube-cli transcript dQw4w9WgXcQ --timestamps
   $ youtube-cli transcript dQw4w9WgXcQ --save
-  $ youtube-cli transcript dQw4w9WgXcQ --language it`)
+  $ youtube-cli transcript dQw4w9WgXcQ --language it
+  $ youtube-cli transcript dQw4w9WgXcQ --refresh
+
+Transcripts are saved for 7 days in ~/.cache/youtube-mcp/transcripts/ so repeat
+requests skip YouTube. Use --refresh to fetch again, or set YOUTUBE_MCP_NO_CACHE=1.`)
   .option("-l, --language <code>", "language code", "en")
   .option("-t, --timestamps", "include [MM:SS] timestamps")
   .option("-s, --save", "save as .md file to Downloads instead of printing")
-  .action(async (url: string, opts: { language: string; timestamps?: boolean; save?: boolean }) => {
+  .option("-r, --refresh", "ignore the saved copy and fetch again from YouTube")
+  .action(async (url: string, opts: { language: string; timestamps?: boolean; save?: boolean; refresh?: boolean }) => {
     const { quiet } = program.opts();
     const videoId = extractVideoId(url);
     if (!videoId) fatal(`invalid YouTube URL or video ID: "${url}"`);
@@ -83,7 +88,7 @@ Examples:
       fs.mkdirSync(dir, { recursive: true });
       const stop = spinner("Saving transcript", quiet);
       try {
-        const filepath = await saveTranscriptFile(videoId, opts.language, dir, !!opts.timestamps);
+        const filepath = await saveTranscriptFile(videoId, opts.language, dir, !!opts.timestamps, { refresh: opts.refresh });
         stop();
         console.log(`Saved to: ${filepath}`);
       } catch (err) {
@@ -96,8 +101,8 @@ Examples:
     const stop = spinner("Fetching transcript", quiet);
     try {
       const text = opts.timestamps
-        ? await getTranscriptTimed(videoId, opts.language)
-        : await getTranscriptText(videoId, opts.language);
+        ? await getTranscriptTimed(videoId, opts.language, { refresh: opts.refresh })
+        : await getTranscriptText(videoId, opts.language, { refresh: opts.refresh });
       stop();
       console.log(text);
     } catch (err) {
@@ -116,14 +121,15 @@ Examples:
   $ youtube-cli search dQw4w9WgXcQ "never gonna"
   $ youtube-cli search dQw4w9WgXcQ "chorus" --language en`)
   .option("-l, --language <code>", "language code", "en")
-  .action(async (url: string, query: string, opts: { language: string }) => {
+  .option("-r, --refresh", "ignore the saved copy and fetch again from YouTube")
+  .action(async (url: string, query: string, opts: { language: string; refresh?: boolean }) => {
     const { quiet } = program.opts();
     const videoId = extractVideoId(url);
     if (!videoId) fatal(`invalid YouTube URL or video ID: "${url}"`);
 
     const stop = spinner(`Searching for "${query}"`, quiet);
     try {
-      const result = await searchInTranscript(videoId, query, opts.language);
+      const result = await searchInTranscript(videoId, query, opts.language, { refresh: opts.refresh });
       stop();
       if (result.startsWith("No matches found")) {
         process.stderr.write(`${result}\n`);
@@ -222,8 +228,8 @@ _youtube_cli_complete() {
     return 0
   fi
   case "$prev" in
-    transcript) COMPREPLY=(\$(compgen -W "--timestamps --save --language --help" -- "$cur")) ;;
-    search)     COMPREPLY=(\$(compgen -W "--language --quiet --help" -- "$cur")) ;;
+    transcript) COMPREPLY=(\$(compgen -W "--timestamps --save --refresh --language --help" -- "$cur")) ;;
+    search)     COMPREPLY=(\$(compgen -W "--language --refresh --quiet --help" -- "$cur")) ;;
     metadata)   COMPREPLY=(\$(compgen -W "--json --quiet --help" -- "$cur")) ;;
     download)   COMPREPLY=(\$(compgen -W "--audio --quality --format --help" -- "$cur")) ;;
   esac
@@ -246,8 +252,8 @@ _youtube_cli() {
     2) _describe 'command' commands ;;
     *)
       case $words[2] in
-        transcript) _arguments '-l[language code]:code' '-t[include timestamps]' '-s[save to Downloads]' ;;
-        search)     _arguments '-l[language code]:code' ;;
+        transcript) _arguments '-l[language code]:code' '-t[include timestamps]' '-s[save to Downloads]' '-r[fetch again from YouTube]' ;;
+        search)     _arguments '-l[language code]:code' '-r[fetch again from YouTube]' ;;
         metadata)   _arguments '-j[output as JSON]' ;;
         download)   _arguments '-a[audio only]' '-q[quality]:quality:(best hd1080 hd720 sd480 sd360)' '-f[format]:format:(mp3 m4a aac flac opus wav vorbis)' ;;
       esac

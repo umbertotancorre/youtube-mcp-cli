@@ -32,6 +32,7 @@ All locally. No API keys required.
 - [CLI](#cli)
   - [Commands](#commands)
   - [Installation](#installation-1)
+- [Good to know](#good-to-know)
 - [Development](#development)
 - [Disclaimer](#disclaimer)
 - [License](#license)
@@ -92,6 +93,7 @@ All tools appear automatically. No install needed, `npx` handles it on first run
 youtube-cli transcript <url>                  Print transcript as plain text
 youtube-cli transcript <url> --timestamps     Include [MM:SS] timestamps
 youtube-cli transcript <url> --save           Save as .md to Downloads
+youtube-cli transcript <url> --refresh        Ignore the saved copy, fetch again
 youtube-cli transcript <url> --language it    Fetch in a specific language
 
 youtube-cli search <url> <query>              Search transcript with timestamps
@@ -139,6 +141,16 @@ source <(youtube-cli completions)
 # zsh
 youtube-cli completions zsh > ~/.zsh/completions/_youtube-cli
 ```
+
+---
+
+## Good to know
+
+**First run takes a few minutes.** On first install, `yt-dlp` and `ffmpeg` are downloaded and your OS runs a one-time security scan on them (about 3 minutes on a fresh Mac). After that, every start takes under a second. For the MCP server, if your client times out on that first launch, just restart it.
+
+**Transcripts are saved for 7 days** in `~/.cache/youtube-mcp/transcripts/`, so asking about the same video again is instant and doesn't contact YouTube. In the CLI, use `--refresh` to fetch a fresh copy. To turn saving off, set `YOUTUBE_MCP_NO_CACHE=1` (for the MCP server, add `"env": { "YOUTUBE_MCP_NO_CACHE": "1" }` to its entry in your MCP config).
+
+**If YouTube blocks you.** YouTube temporarily limits how many transcripts one internet connection can fetch. When that happens you'll get a clear "YouTube is temporarily limiting requests" message instead of a vague error. Waiting (sometimes a few hours) clears it, and saved transcripts keep working in the meantime.
 
 ---
 
