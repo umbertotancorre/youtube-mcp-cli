@@ -1,6 +1,6 @@
 {
   "name": "@umbertotancorre/youtube-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "CLI for YouTube transcripts, metadata, search, and downloads",
   "main": "dist/index.js",
   "bin": {
